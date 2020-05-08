@@ -27,6 +27,7 @@ class ClientProtocol(asyncio.Protocol):
                         self.transport.write(
                             f"Логин {new_login} занят, попробуйте другой".encode()
                         )
+                        self.transport.close()
                         break
                 else:
                     self.login = new_login
@@ -39,7 +40,6 @@ class ClientProtocol(asyncio.Protocol):
                 self.transport.write(
                     f"Представтесь, пожалуйста".encode()
                 )
-
         else:
             self.send_message(decoded)
 
@@ -56,7 +56,7 @@ class ClientProtocol(asyncio.Protocol):
 
         for client in self.server.clients:
             #пока пользователь не ввел логин, он не получает сообщения
-            if (client.login != self.login) and (client.login != None):
+            if (client.login != self.login) and (not client.login is None):
                 client.transport.write(encoded)
 
         self.add_message_to_history(f"{format_string}")
